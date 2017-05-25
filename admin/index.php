@@ -20,7 +20,6 @@
   <body>
     <?php include 'admin/views/header.php';?>
     <div class="container">
-
       <form class="form-signin">
         <h2 class="form-signin-heading">Авторизация</h2>
         <label for="inputEmail" class="sr-only">Имя</label>
@@ -29,7 +28,6 @@
         <input type="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
       </form>
-
     </div> <!-- /container -->
 
 

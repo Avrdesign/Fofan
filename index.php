@@ -11,58 +11,9 @@
     <!-- Bootstrap -->
     <link href="https://fonts.googleapis.com/css?family=Alice" rel="stylesheet">
     <link href="src/css/bootstrap.min.css" rel="stylesheet">
-      <style>
-          html,body{
-              font-family: 'Alice', serif;
-          }
-          .marginTop70PX{margin-top: 70px;}
-          .backgroundColorBlack {background-color: #101010;}
-          .colorWhite{color:white;}
-          .colorLightGray{color:#9d9d9d;}
-          .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover{
-              z-index: 2;
-              color: #fff;
-              background-color: #101010;
-              border-color: #101010;
-          }
-          .list-group-item.active>.badge, .nav-pills>.active>a>.badge {
-              color: #101010;
-              background-color: #fff;
-          }
-          .btn-darck{
-              color: #9d9d9d;
-              background-color: #101010;
-              border-color: #101010;
-          }
-          .btn-darck:hover{
-              color: #fff;
-              background-color: #101010;
-              border-color: #101010;
-          }
-          .btn-darck:focus{
-              color: #fff;
-          }
-          .paddingLeftRight3PX{padding-left: 3px;padding-right: 3px;}
-          .fontSize16PX{font-size: 16px;}
-          .vkLike:hover{color:white;cursor: pointer;}
-          .positionFixed{
-              position: fixed;
-          }
-          .width25PER{width: 25%;}
-          .width18PER{width: 20%;}
+    <link href="src/css/main.css" rel="stylesheet">
 
-          .marginBottom20PX{
-              margin-bottom: 20px;
-          }
-          .paddingTopBottom40px{
-              padding-top: 40px;
-              padding-bottom: 40px;
-          }
-          .marginBottom0PX{
-              margin-bottom: 0px;
-          }
-      </style>
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>

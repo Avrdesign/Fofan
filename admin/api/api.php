@@ -1,7 +1,17 @@
 <?php
 
-    $categories = array(1,2,3);
-    $items = array(6,5,6);
-    $info = "rewgwehew@mail.ru";
-    $banners = array("gg","ff");
+    require_once 'utils.php';
+
+    define('CATEGORY_PATH',"admin/DB/categories.json");
+    define('INFO_PATH',"admin/DB/info.json");
+    define('ITEM_PATH',"admin/DB/category_items_");
+    define('IMAGES_PATH',"src/images/");
+
+    $categories = getAllCategories();
+    $items = getLastItemsCountByStep(1);
+    $info = getInfo();
+    $banners = array();
+
+    var_dump($items);
+
 

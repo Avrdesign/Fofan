@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../src/img/favicon.ico">
 
-    <title>Signin Template for Bootstrap</title>
+    <title>Администратор</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../src/css/bootstrap.min.css" rel="stylesheet">
@@ -18,7 +18,6 @@
   </head>
 
   <body>
-    <?php include 'admin/views/header.php';?>
     <div class="container">
       <form class="form-signin">
         <h2 class="form-signin-heading">Авторизация</h2>

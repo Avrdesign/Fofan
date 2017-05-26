@@ -12,6 +12,4 @@
     $info = getInfo();
     $banners = array();
 
-    var_dump($items);
-
 

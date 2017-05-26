@@ -8,7 +8,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">For-Fun <small class="hidden-xs"> - cайт смешных картинок</small></a>
+            <a class="navbar-brand" href="/"><?php echo $info["title"];?><small class="hidden-xs"><?php echo $info["sub_title"];?></small></a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->

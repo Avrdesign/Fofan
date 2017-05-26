@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>For-Fun</title>
-
+    <title><?php echo $info["title"];?></title>
+    <link rel="icon" href="<?php echo IMAGES_PATH.$info["icon"];?>">
     <!-- Bootstrap -->
     <link href="https://fonts.googleapis.com/css?family=Alice" rel="stylesheet">
     <link href="src/css/bootstrap.min.css" rel="stylesheet">

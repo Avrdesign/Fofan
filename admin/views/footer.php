@@ -2,7 +2,7 @@
     <div class="container paddingTopBottom40px">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" href="/">For-Fun <small class="hidden-xs"> - cайт смешных картинок</small></a>
+            <a class="navbar-brand" href="/"><?php echo $info["title"];?><small class="hidden-xs"><?php echo $info["sub_title"];?></small></a>
         </div>
         <ul class="nav navbar-nav navbar-right">
             <li><a href="#">&copy 2017 <?php echo $info;?></a></li>

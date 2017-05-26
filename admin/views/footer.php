@@ -5,7 +5,7 @@
             <a class="navbar-brand" href="/"><?php echo $info["title"];?><small class="hidden-xs"><?php echo $info["sub_title"];?></small></a>
         </div>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">&copy 2017 <?php echo $info;?></a></li>
+            <li><a href="#">&copy 2016-<?php echo date("Y")," ",$info["email"];?></a></li>
         </ul>
     </div><!-- /.container-fluid -->
 </nav>

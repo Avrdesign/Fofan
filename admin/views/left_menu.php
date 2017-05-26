@@ -4,18 +4,12 @@
             <span class="badge">14</span>
             Все
         </a>
-        <a href="#" class="list-group-item">
-            <span class="badge">23</span>
-            Животные
-        </a>
-        <a href="#" class="list-group-item">
-            <span class="badge">10</span>
-            Дети
-        </a>
-        <a href="#" class="list-group-item">
-            <span class="badge">14</span>
-            Природа
-        </a>
+        <?php foreach ($categories as $category) {?>
+            <a href="#" class="list-group-item">
+                <span class="badge"><?php echo $category["count"];?></span>
+                <?php echo $category["name"];?>
+            </a>
+        <?php } ?>
     </div>
 
     <div class="leftBanner">

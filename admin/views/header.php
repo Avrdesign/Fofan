@@ -14,11 +14,20 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right visible-xs">
-                <li><a href="#">Все<span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></a></li>
-                <li><a href="#">Животные<span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></a></li>
-                <li><a href="#">Спорт<span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></a></li>
-                <li><a href="#">Дети<span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></a></li>
-                <li><a href="#">Природа<span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></a></li>
+                <li>
+                    <a href="#">Все
+<!--                        <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>-->
+                        <span class="badge pull-right">10</span>
+                    </a>
+                </li>
+                <?php foreach ($categories as $category) {?>
+                    <li>
+                        <a href="#"><?php echo $category["name"];?>
+<!--                            <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>-->
+                            <span class="badge pull-right"><?php echo $category["count"];?></span>
+                        </a>
+                    </li>
+                <?php }?>
                 <hr>
                 <li><a href="#" data-toggle="modal" data-target="#exampleModal">Добавить картинку<span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span></a></li>
                 <li><a href="#" data-toggle="modal" data-target="#exampleModal2">Контакты<span class="glyphicon glyphicon-envelope pull-right" aria-hidden="true"></span></a></li>

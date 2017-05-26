@@ -47,3 +47,34 @@ html,body{
 .marginBottom0PX{
     margin-bottom: 0px;
 }
+
+.navbar-inverse .navbar-toggle:focus, .navbar-inverse .navbar-toggle:hover {
+     background-color: transparent;
+}
+
+.navbar-inverse .navbar-toggle {
+    border-color: transparent;
+}
+
+.navbar-toggle .icon-bar:nth-of-type(2) {
+
+}
+.navbar-toggle .icon-bar:nth-of-type(3) {
+
+}
+.navbar-toggle .icon-bar {
+    position: relative;
+    transition: all 200ms ease-in-out;
+}
+.navbar-toggle.active .icon-bar:nth-of-type(4) {
+    transform: rotate(45deg);
+    top:-6px;
+}
+.navbar-toggle.active .icon-bar:nth-of-type(2) {
+    transform: rotate(-45deg);
+    top:6px;
+
+}
+.navbar-toggle.active .icon-bar:nth-of-type(3) {
+    background-color: transparent !important;
+}

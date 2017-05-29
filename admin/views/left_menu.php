@@ -1,4 +1,4 @@
-<div class="positionFixed width25PER">
+<div class="">
     <div class="list-group">
         <a href="#" class="list-group-item active">
             <span class="badge">14</span>

@@ -24,16 +24,22 @@
 
   <?php require 'admin/views/header.php';?>
 
-  <div class="container marginTop70PX">
+  <div class="container-fluid marginTop70PX">
       <div class="row">
-          <div class="col-sm-4 hidden-xs">
+          <div class="col-sm-offset-1 col-sm-3 positionFixed hidden-xs">
               <?php require 'admin/views/left_menu.php' ?>
           </div>
-          <div class="col-sm-5">
-              <?php require 'admin/views/content.php' ?>
-          </div>
-          <div class="col-sm-3 hidden-xs">
+          <div class="col-sm-offset-8 col-sm-3 positionFixed hidden-xs">
               <?php require 'admin/views/right_menu.php' ?>
+          </div>
+      </div>
+  </div>
+
+
+  <div class="container-fluid ">
+      <div class="row">
+          <div class="col-sm-offset-4 col-sm-4">
+              <?php require 'admin/views/content.php' ?>
           </div>
       </div>
   </div>

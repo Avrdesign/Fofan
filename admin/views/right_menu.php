@@ -1,4 +1,4 @@
-<div class="positionFixed width18PER">
+<div class="">
 
     <button class="btn btn-darck btn-block marginBottom20PX" data-toggle="modal" data-target="#exampleModal">Добавить картинку</button>
     <button class="btn btn-darck btn-block marginBottom20PX" data-toggle="modal" data-target="#exampleModal2">Контакты</button>

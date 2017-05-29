@@ -31,9 +31,7 @@ html,body{
 .paddingLeftRight3PX{padding-left: 3px;padding-right: 3px;}
 .fontSize16PX{font-size: 16px;}
 .vkLike:hover{color:white;cursor: pointer;}
-.positionFixed{
-    position: fixed;
-}
+.positionFixed{ position: fixed !important; }
 .width25PER{width: 25%;}
 .width18PER{width: 20%;}
 
@@ -77,4 +75,22 @@ html,body{
 }
 .navbar-toggle.active .icon-bar:nth-of-type(3) {
     background-color: transparent !important;
+}
+
+.btn, .form-control, .alert, .input-group-addon {
+    border-radius: 0px;
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.list-group-item:last-child {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.alert {
+    text-align: left;
 }

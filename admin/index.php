@@ -34,6 +34,6 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="admin.js"></script>
+    <script src="../src/js/admin.js"></script>
   </body>
 </html>

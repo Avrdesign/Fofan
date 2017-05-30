@@ -9,19 +9,18 @@
 require_once 'utils.php';
 
 $title = $_POST["title"];
-$categoryId = $_POST["category_id"];
-$urlImage = $_POST["url"];
+$categoryId = $_POST["category"];
+$type = $_POST["type"];
+$url = $_POST["url"];
 
-if (isset($title,$categoryId)){
-    $answer = array();
-    if (isset($urlImage)){
-        $answer["status"] = addItemToValidation($title,$categoryId,$urlImage);
-        $answer["message"] = $answer["status"] ? "Ваша картинка отправлена на валидацию": "Сбой сервера";
-    }else if (isset($_FILES)){
+
+if(isset($title,$categoryId)){
+    $answer = array("status"=>false);
+    if($type == 'url'){
+        $answer["status"] = addItemToValidation($title,$categoryId,$url);
+    }else if($type == 'file'){
         $answer["status"] = addItemToValidation($title,$categoryId);
-        $answer["message"] = $answer["status"] ? "Ваша картинка отправлена на валидацию": "Сбой сервера";
-    }else{
-        $answer["status"] = false;
     }
+    $answer["message"] = $answer["status"] ? "Ваша картинка отправлена на валидацию" : "Сбой сервера";
     echo json_encode($answer);
 }

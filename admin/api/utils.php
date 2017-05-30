@@ -14,26 +14,27 @@
     define('IMAGE_MAX_WIDTH',400);
 
     function addItemToValidation($title,$categoryId,$url = null){
+        $image_path = '../../'.IMAGES_PATH;
         if (isset($url)){
-            $image_path = '../../'.IMAGES_PATH;
-            $name = loadImageAndResize($url, $image_path, IMAGE_MAX_WIDTH);
+            if( $image = file_get_contents($url) ) {
+
+                # Генерируем имя tmp-изображения
+                $tmp_file_name = md5(microtime());
+
+                # Сохраняем изображение
+                file_put_contents($tmp_file_name, $image);
+
+                # Очищаем память
+                unset($image);
+
+                $name = uploadImageAndResize($tmp_file_name, $image_path, IMAGE_MAX_WIDTH);
+                return addItemToFile($title,$categoryId, $name);
+            }
+            return false;
+        }else if(isset($_FILES['file'])){
+            $tmp_file_name = $_FILES["file"]['tmp_name'];
+            $name = uploadImageAndResize($tmp_file_name, $image_path, IMAGE_MAX_WIDTH);
             return addItemToFile($title,$categoryId, $name);
-        }else if(isset($_FILES)){
-            $image_path = '../../'.IMAGES_PATH;
-            switch ($_FILES['image']['type']) {
-                case 'image/jpeg': $ext = ".jpg"; break;
-                case 'image/png': $ext = ".png"; break;
-                case 'image/gif': $ext = ".gif"; break;
-                default: $ext = ''; break;
-            }
-            if (!$ext){
-                return false;
-            }
-            $file = $_FILES["image"]['tmp_name'];
-            $imgName = md5(microtime()).$ext;
-            $fullNameImage = $image_path.$imgName;
-            resizeImageToWidth($file, $fullNameImage, IMAGE_MAX_WIDTH);
-            return addItemToFile($title,$categoryId,$imgName);
         }
         else{
             return false;
@@ -41,111 +42,72 @@
     }
 
     # Функция для загрузки и ресайза изображений
-    function loadImageAndResize( $url, $preview_path, $size )
-    {
+    function uploadImageAndResize($imageTemp, $imagePath, $maxWidth ){
         /*
-         * $url - ссылка на изображение
-         * $preview_path - папка, куда сохраняем превьюшки
-         * $original_path - папка, куда сохраняем оригинал
-         * $size - размер большей строны (в пикселях)
+         * $imageTemp - ссылка на временное изображение
+         * $imagePath - папка, куда сохраняем обработанную картинку
+         * $maxWidth -  ширина картинки
         */
 
         # Допустимые расширения
-        $enabled = array( 'png', 'gif', 'jpeg', 'jpg');
+        $enabled = array( 'png', 'gif', 'jpeg');
 
-        # Получаем изображение. Если функция не отработала
-        if( $image = file_get_contents( $url ) )
+        if( $info = getimagesize( $imageTemp ) )
         {
-            # Генерируем имя tmp-изображения
-            $tmp_name = md5(microtime());
+            $type = trim( strrchr( $info['mime'], '/' ), '/' );
 
-            # Сохраняем изображение
-            file_put_contents( $tmp_name, $image );
+            # Если тип не подходит
+            if( !in_array( $type, $enabled ) )
+                return false;
+
+            # Исходя из типа формируем названия функций
+            $imageCreateF = 'imagecreatefrom' . $type;
+            $imageSaveF = 'image' . $type;
+            $imageName = md5(microtime()) . '.' . $type;
+
+            # Получаем данные об изображении
+            list( $width, $height ) = $info;
+
+            # Создаём ресурс изображения
+            $src_im = $imageCreateF( $imageTemp );
+
+            # Коэффициент
+            $ratio = $width / $maxWidth;
+
+            # Вычисляем ширину
+            $new_width = $maxWidth;
+
+            # Вычисляем высоту
+            $new_height = $height / $ratio;
+
+            # Создаём новое изображение
+            $dst_im = imagecreatetruecolor( $new_width, $new_height );
+
+            # Ресайзим
+            imagecopyresampled( $dst_im, $src_im, 0, 0, 0, 0, $new_width, $new_height, $width, $height );
+
+            # Чистим память
+            unset( $src_im );
+
+            # Сохраняем превьюшку
+            if( !$imageSaveF($dst_im, $imagePath . $imageName ) ) return  false;
 
             # Очищаем память
-            unset( $image );
+            unset( $dst_im );
 
-            # Если getimagesize вернула массив
-            if( $info = getimagesize( $tmp_name ) )
-            {
-                # Вычисляем тип изображения
-                $type = trim( strrchr( $info['mime'], '/' ), '/' );
+            # Удалем временный файл
+            unlink( $imageTemp );
 
-                # Если тип не подходит
-                if( !in_array( $type, $enabled ) ) die( $type . ' - Недопустимый тип файла' );
-                $type_format = $type == 'jpg' ? 'jpeg' : $type ;
-                # Исходя из типа формируем названия функций
-                $imagecreate = 'imagecreatefrom' . $type_format;
-                $imagesave = 'image' . $type;
-                $imagename = md5(microtime()) . '.' . $type;
-
-                # Получаем данные об изображении
-                list( $width, $height ) = $info;
-
-                # Создаём ресурс изображения
-                $src_im = $imagecreate( $tmp_name );
-
-                # Вычисляем ширину
-                $new_width = $width > $height ? $size : ceil( ( $width * $size ) / $height );
-
-                # Вычисляем высоту
-                $new_height = $width < $height ? $size : ceil( ( $height * $size ) / $width );
-
-                # Создаём новое изображение
-                $dst_im = imagecreatetruecolor( $new_width, $new_height );
-
-                # Ресайзим
-                imagecopyresampled( $dst_im, $src_im, 0, 0, 0, 0, $new_width, $new_height, $width, $height );
-
-                # Чистим память
-                unset( $src_im );
-
-                # Сохраняем превьюшку
-                if( !$imagesave($dst_im, $preview_path . $imagename ) ) $return = false;
-
-                # Очищаем память
-                unset( $dst_im );
-                unlink( $tmp_name );
-
-                # Возвращаем
-                return $imagename;
-            }
+            # Возвращаем имя
+            return $imageName;
         }
     }
 
-    function resizeImageToWidth($fileName, $newFileName,$width){
-        $image_info = getimagesize($fileName);
-        $image_type = $image_info[2];
-        if( $image_type == IMAGETYPE_JPEG ) {
-            $image = imagecreatefromjpeg($fileName);
-        } elseif( $image_type == IMAGETYPE_GIF ) {
-            $image = imagecreatefromgif($fileName);
-        } elseif( $image_type == IMAGETYPE_PNG ) {
-            $image = imagecreatefrompng($fileName);
-        }
-        $imageW = imagesx($image);
-        $imageH = imagesy($image);
-        $ratio = $width / $imageW;
-        $height = $imageH * $ratio;
-        $new_image = imagecreatetruecolor($width, $height);
-        imagecopyresampled($new_image, $image, 0, 0, 0, 0, $width, $height, $imageW, $imageH);
-        $image = $new_image;
+    function addItemToFile($title,$categoryId,$imageName){
 
-        if( $image_type == IMAGETYPE_JPEG ) {
-            imagejpeg($image,$newFileName);
-        } elseif( $image_type == IMAGETYPE_GIF ) {
-            imagegif($image,$newFileName);
-        } elseif( $image_type == IMAGETYPE_PNG ) {
-            imagepng($image,$newFileName);
-        }
-        unset($image);
-    }
-
-    function addItemToFile($title,$categoryId,$img){
-
-        if (file_exists(ITEM_VALIDATION_PATH)){
+        if (file_exists(ITEM_VALIDATION_PATH) && $imageName){
             $handler = fopen(ITEM_VALIDATION_PATH,'a');
-            $item = array($categoryId,$img,$title);
+            $item = array($categoryId,$imageName,$title);
             fputcsv($handler,$item);
             fclose($handler);
             return true;

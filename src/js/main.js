@@ -18,39 +18,37 @@
     }
 
     var sendMessageButton = document.getElementById("send_message");
-    sendMessageButton.addEventListener('click',function(){
-
-       var name = document.getElementById('message-name').value;
-       var message = document.getElementById('message-text').value;
-       var form = document.getElementById('send_message_form');
-
-       if (name.length < 2) {
-           showAlert(this.parentNode, ERRORS.LENGTH_NAME_ERROR, 0);
-           return;
-       }
-
-       if (message.length < 5){
-            showAlert(this.parentNode, ERRORS.LENGTH_MESSAGE_ERROR, 0);
-            return;
-       }
-
-       var hash = {"name":name,"message":message};
-
-       sendData(URLS.SEND_MESSAGE, hash, this.parentNode, form);
-
-    }, false);
-
     var sendNewItemButton = document.getElementById("send_new_item");
-    sendNewItemButton.addEventListener('click',function(){
 
+    addListenerForButtonsForm();
+    
+    function sendMessage(){
+        removeListenerForButtonsForm();
         var parent = this.parentNode;
-        var title = document.getElementById('add_item_title').value;
-        var categoryId = document.getElementById('add_item_category').value;
+        var name = document.getElementById('message-name').value;
+        var message = document.getElementById('message-text').value;
+        var form = document.getElementById('send_message_form');
 
-        var hash = {"title":title,"category_id":categoryId};
+        if (name.length < 2) {
+            showAlert(parent, ERRORS.LENGTH_NAME_ERROR, 0);
+            addListenerForButtonsForm();
+            return;
+        }
 
-        var form = document.getElementById('add_item_form_file');
+        if (message.length < 5){
+            showAlert(parent, ERRORS.LENGTH_MESSAGE_ERROR, 0);
+            addListenerForButtonsForm();
+            return;
+        }
+        sendData(URLS.SEND_MESSAGE, new FormData(form), parent, form);
+    }
+
+    function sendItem(){
+        removeListenerForButtonsForm();
+        var parent = this.parentNode;
+        var form = document.getElementById('add_item_form');
         var radios = document.getElementsByName('radio_status');
+        var formData = new FormData(form);
         var imageType;
         for (var i = 0, length = radios.length; i < length; i++) {
             if (radios[i].checked) {
@@ -63,37 +61,35 @@
             var url = document.getElementById("add_item_form_url").value;
             if(url == ""){
                 showAlert(parent, ERRORS.EMPTY_URL_ERROR, 0);
+                addListenerForButtonsForm();
                 return;
             }else{
                 var img = new Image();
                 img.onload = function(){
-                    hash[imageType] = url;
-                    sendData(URLS.SEND_ITEM, hash, parent, form);
+                    formData.append('type',imageType);
+                    sendData(URLS.SEND_ITEM, formData, parent, form);
                 };
                 img.onerror = function(){
                     showAlert(parent, ERRORS.ADDRESS_URL_ERROR, 0);
+                    addListenerForButtonsForm();
                 };
                 img.src = url;
             }
         }else{
-            var form = document.getElementById("add_item_form_file");
-            var inputFile = form.getElementsByTagName("input")[0];
+            var inputFile = document.getElementById("input-file");
             var fileObj = inputFile.files[0];
             if (fileObj){
-                var formData = new FormData(form);
-                formData.append('title', hash['title']);
-                formData.append('category_id', hash['category_id']);
-
-                uploadImage(URLS.SEND_ITEM, formData, this.parentNode,form);
+                formData.append('type',imageType);
+                sendData(URLS.SEND_ITEM, formData, parent,form);
             }else{
                 showAlert(parent, ERRORS.FILE_EMPTY_ERROR, 0);
+                addListenerForButtonsForm();
             }
         }
 
-    }, false);
+    }
 
-
-    function uploadImage(url,formData, element, form){
+    function sendData(url,formData, element, form){
         $.ajax({
             url: url,
             type: "POST",
@@ -107,49 +103,28 @@
                     if (form.reset){
                         form.reset();
                     }
-                    clearInputsFromDiv();
                 }else{
                     showAlert(element, ERRORS.SERVER_ERROR, 0);
                 }
+                addListenerForButtonsForm();
             },
             error: function(){
                 showAlert(element, ERRORS.SERVER_ERROR, 0);
+                addListenerForButtonsForm();
             }
         });
     }
 
-
-    function sendData(url,hash, element, form){
-        $.ajax({
-            url: url,
-            method:'POST',
-            data:hash,
-            dataType:'json',
-            success:function(data){
-                if(data["status"]){
-                    showAlert(element, data["message"], 1);
-                    if (form.reset){
-                        form.reset();
-                    }
-                    clearInputsFromDiv();
-                }else{
-                    showAlert(element, ERRORS.SERVER_ERROR, 0);
-                }
-            },
-            error: function(){
-                showAlert(element, ERRORS.SERVER_ERROR, 0);
-            }
-        });
+    function addListenerForButtonsForm() {
+        sendMessageButton.addEventListener('click', sendMessage, false);
+        sendNewItemButton.addEventListener('click', sendItem, false);
     }
 
-    function clearInputsFromDiv(){
-        var divBlock = document.getElementById('add_item_form');
-        var inputs = divBlock.getElementsByTagName('input');
-        for(var i = 0; i < inputs.length; i++){
-            inputs[i].value = "";
-        }
+    function removeListenerForButtonsForm() {
+        sendMessageButton.removeEventListener('click', sendMessage, false);
+        sendNewItemButton.removeEventListener('click', sendItem, false);
     }
-    
+
     function showAlert(element, text, status) {
         var alert = document.getElementsByClassName('alertShow')[0];
         if (alert){

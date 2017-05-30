@@ -13,7 +13,6 @@ $categoryId = $_POST["category"];
 $type = $_POST["type"];
 $url = $_POST["url"];
 
-
 if(isset($title,$categoryId)){
     $answer = array("status"=>false);
     if($type == 'url'){

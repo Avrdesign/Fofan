@@ -1,4 +1,4 @@
-
+<?php require_once 'api/utils.php'?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -18,22 +18,26 @@
   </head>
 
   <body>
-    <div class="container">
-      <form class="form-signin">
-        <h2 class="form-signin-heading">Авторизация</h2>
-        <label for="inputEmail" class="sr-only">Имя</label>
-        <input type="email" id="inputEmail" class="form-control" placeholder="Имя" required autofocus>
-        <label for="inputPassword" class="sr-only">Пароль</label>
-        <input type="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
-      </form>
-    </div> <!-- /container -->
 
-
+  <?php
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    if( isset($email,$password)){
+        $access = validateUser($email,$password);
+        if ($access["status"]){
+            require 'views/admin_panel.php';
+        }else{
+            require 'views/admin_form.php';
+        }
+    }else {
+        require 'views/admin_form.php';
+    }
+  ?>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../src/js/admin.js"></script>
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script defer src="../src/js/bootstrap.min.js"></script>
   </body>
 </html>

@@ -13,6 +13,17 @@
     define('IMAGES_PATH',"src/images/");
     define('IMAGE_MAX_WIDTH',400);
 
+    function validateUser($email,$password){
+        $info = getInfo('DB/info.json');
+        $answer = array("status"=>false);
+        if ($email != $info['email'] or $password != $info['password'] ){
+            $answer["message"] = true;
+        }else{
+            $answer["status"] = true;
+        }
+        return $answer;
+    }
+
     function addItemToValidation($title,$categoryId,$url = null){
         $image_path = '../../'.IMAGES_PATH;
         if (isset($url)){
@@ -81,7 +92,7 @@
             $new_height = $height / $ratio;
 
             # Создаём новое изображение
-            $dst_im = imagecreatetruecolor( $new_width, $new_height );
+            $dst_im = imagecreatetruecolor($new_width, $new_height);
 
             # Ресайзим
             imagecopyresampled( $dst_im, $src_im, 0, 0, 0, 0, $new_width, $new_height, $width, $height );

@@ -1,8 +1,5 @@
-body {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #eee;
-}
+
+.marginTop20PX{margin-top: 20px;}
 
 .form-signin {
   max-width: 330px;

@@ -16,7 +16,7 @@
     function validateUser($email,$password){
         $info = getInfo('DB/info.json');
         $answer = array("status"=>false);
-        if ($email != $info['email'] or $password != $info['password'] ){
+        if ($email != $info['email'] or md5(md5($password)."warcraft3") != $info['password'] ){
             $answer["message"] = true;
         }else{
             $answer["status"] = true;
@@ -101,7 +101,8 @@
             unset( $src_im );
 
             # Сохраняем превьюшку
-            if( !$imageSaveF($dst_im, $imagePath . $imageName ) ) return  false;
+            if( !$imageSaveF($dst_im, $imagePath . $imageName ) )
+                return  false;
 
             # Очищаем память
             unset( $dst_im );

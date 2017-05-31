@@ -1,11 +1,11 @@
 <div class="">
     <div class="list-group">
-        <a href="#" class="list-group-item active">
+        <a href="/" class="list-group-item active">
             <span class="badge">14</span>
             Все
         </a>
         <?php foreach ($categories as $category) {?>
-            <a href="#" class="list-group-item">
+            <a href="?cat_id=<?php echo $category["id"];?>" class="list-group-item">
                 <span class="badge"><?php echo $category["count"];?></span>
                 <?php echo $category["name"];?>
             </a>

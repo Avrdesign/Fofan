@@ -1,4 +1,4 @@
-<?php require_once 'api/utils.php'?>
+<?php require_once 'api/utils.php' ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>

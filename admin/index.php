@@ -26,6 +26,7 @@
         $access = validateUser($email,$password);
         if ($access["status"]){
             require 'views/admin_panel.php';
+            validateItem('img3.jpeg',1,"ffdd");
         }else{
             require 'views/admin_form.php';
         }

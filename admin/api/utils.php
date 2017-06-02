@@ -13,7 +13,15 @@
     define('IMAGES_PATH',"src/images/");
     define('IMAGE_MAX_WIDTH',400);
 
-    function validateUser($email,$password){
+    define('ADMIN_VALIDATION_ITEMS_PATH','DB/items_validation.csv');
+    define('ADMIN_CATEGORIES_ITEMS_PATH','DB/category_items_');
+    define('ADMIN_CATEGORIES_PATH','DB/categories.json');
+    define('ADMIN_IMAGES_PATH','../src/images/');
+
+
+
+
+function validateUser($email,$password){
         $info = getInfo('DB/info.json');
         $answer = array("status"=>false);
         if ($email != $info['email'] or md5(md5($password)."warcraft3") != $info['password'] ){
@@ -119,7 +127,7 @@
 
         if (file_exists(ITEM_VALIDATION_PATH) && $imageName){
             $handler = fopen(ITEM_VALIDATION_PATH,'a');
-            $item = array($categoryId,$imageName,$title);
+            $item = array($imageName,$categoryId,$title);
             fputcsv($handler,$item);
             fclose($handler);
             return true;
@@ -128,15 +136,30 @@
         return false;
     }
 
-    function getAllCategories(){
-        if(file_exists(CATEGORY_PATH)){
-            $content = file_get_contents(CATEGORY_PATH);
+    function addItemToCategoryFile($title,$time,$imageName,$id){
+
+        if (file_exists(ADMIN_CATEGORIES_ITEMS_PATH.$id.'.csv') && $imageName){
+            $handler = fopen(ADMIN_CATEGORIES_ITEMS_PATH.$id.'.csv','a');
+            $item = array($imageName,$time,$title);
+            fputcsv($handler,$item);
+            fclose($handler);
+            return true;
+        }
+
+        return false;
+    }
+
+    # Возвращает массив категорий
+    function getAllCategories($path = CATEGORY_PATH){
+        if(file_exists($path)){
+            $content = file_get_contents($path);
             $categories = json_decode($content,true);
             return $categories;
         }
         return "getAllCategories ERROR";
     }
 
+    # Возвращает категорию по ее id
     function getCategoryById($id){
         if(file_exists(CATEGORY_PATH)){
             $content = file_get_contents(CATEGORY_PATH);
@@ -150,6 +173,107 @@
         }
         return "getCategoryById ERROR";
     }
+
+    # Создание категории
+    function createCategory($name){
+        $idCategory = getMaxIdCategory()+1;
+        fopen(ADMIN_CATEGORIES_ITEMS_PATH.$idCategory.'.csv','w');
+        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        $categories[]= array(
+            "id"=>$idCategory,
+            "name"=>$name,
+            "count"=>0
+        );
+        $str = json_encode($categories);
+        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
+        return true;
+    }
+
+    # Возвращает максимальный id категорий
+    function getMaxIdCategory(){
+        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        $id = $categories[0]["id"];
+        foreach ($categories as $category){
+            if ($category["id"] > $id){
+                $id = $category["id"];
+            }
+        }
+        return $id;
+    }
+
+    # Переименование категории
+    function renameCategory($id, $newName){
+        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        foreach ($categories as &$category){
+            if($category["id"] == $id){
+                $category["name"] = $newName;
+                break;
+            }
+        }
+        $str = json_encode($categories);
+        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
+        return true;
+    }
+
+    # Удаление категории
+    function deleteCategory($categoryId){
+        $items = getAllItems($categoryId);
+        foreach ($items as $item){
+            unlink(ADMIN_IMAGES_PATH.$item[0]);
+        }
+        unlink(ADMIN_CATEGORIES_ITEMS_PATH.$categoryId.'.csv');
+        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        foreach ($categories as $key=>$category){
+            if($category["id"] == $categoryId){
+                unset($categories[$key]);
+                break;
+            }
+        }
+        $categories = array_values($categories);
+        $str = json_encode($categories);
+        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
+        return true;
+    }
+
+    # Получить все items из валидации csv
+    function getItemsValidation(){
+        $fileName = ADMIN_VALIDATION_ITEMS_PATH;
+        if (file_exists($fileName)){
+            $items = array();
+            $handler = fopen($fileName,"r");
+            while( !feof( $handler)){
+                $items[] = fgetcsv($handler);
+            }
+            fclose($handler);
+            return $items;
+        }
+        return "getLastItemsCountByStep $fileName ERROR";
+    }
+
+    # Валидация item
+    function validateItem($imageName,$categoryId,$title){
+        $validationItems = getItemsValidation();
+        foreach ($validationItems as $key=>$validationItem){
+            if ($validationItem[0] == $imageName){
+                unset($validationItems[$key]);
+                break;
+            }
+        }
+        $validationItems = array_values($validationItems);
+        outputCSV($validationItems);
+        return addItemToCategoryFile($title,time(),$imageName,$categoryId);
+    }
+
+    function outputCSV($validationItems) {
+        $handler = fopen(ADMIN_VALIDATION_ITEMS_PATH, 'w');
+        foreach($validationItems as $item) {
+            fputcsv($handler, $item);
+        }
+        fclose($handler);
+    }
+    # Удаление item
+
+
 
     function getInfo($path = INFO_PATH){
         if(file_exists($path)){
@@ -184,6 +308,21 @@
                 if ($i >= $startPosition){
                     array_unshift($items, $item);
                 }
+            }
+            fclose($handler);
+            return $items;
+        }
+        return "getLastItemsCountByStep $fileName ERROR";
+    }
+
+    # Возвращает массив объектов из sv
+    function getAllItems($categoryId){
+        $fileName = ADMIN_CATEGORIES_ITEMS_PATH.$categoryId.".csv";
+        if (file_exists($fileName)){
+            $items = array();
+            $handler = fopen($fileName,"r");
+            while( !feof( $handler)){
+                $items[] = fgetcsv($handler);
             }
             fclose($handler);
             return $items;

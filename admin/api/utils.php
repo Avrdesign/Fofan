@@ -17,11 +17,16 @@
     define('ADMIN_CATEGORIES_ITEMS_PATH','DB/category_items_');
     define('ADMIN_CATEGORIES_PATH','DB/categories.json');
     define('ADMIN_IMAGES_PATH','../src/images/');
+    define('ADMIN_INFO_PATH',"DB/info.json");
+
+    define('ADMIN_AJAX_VALIDATION_ITEMS_PATH','../DB/items_validation.csv');
+    define('ADMIN_AJAX_CATEGORIES_ITEMS_PATH','../DB/category_items_');
+    define('ADMIN_AJAX_CATEGORIES_PATH','../DB/categories.json');
+    define('ADMIN_AJAX_IMAGES_PATH','../../src/images/');
+    define('ADMIN_AJAX_INFO_PATH',"../DB/info.json");
 
 
-
-
-function validateUser($email,$password){
+    function validateUser($email,$password){
         $info = getInfo('DB/info.json');
         $answer = array("status"=>false);
         if ($email != $info['email'] or md5(md5($password)."warcraft3") != $info['password'] ){
@@ -159,6 +164,21 @@ function validateUser($email,$password){
         return "getAllCategories ERROR";
     }
 
+    # Возвращает ответ - существует ли категория
+    function isCategoryExist($id,$path = CATEGORY_PATH){
+        if(file_exists($path)){
+            $content = file_get_contents($path);
+            $categories = json_decode($content,true);
+            foreach ($categories as $category) {
+                if ($category['id'] == $id){
+                    return $category['id'];
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
     # Возвращает категорию по ее id
     function getCategoryById($id){
         if(file_exists(CATEGORY_PATH)){
@@ -176,22 +196,23 @@ function validateUser($email,$password){
 
     # Создание категории
     function createCategory($name){
-        $idCategory = getMaxIdCategory()+1;
-        fopen(ADMIN_CATEGORIES_ITEMS_PATH.$idCategory.'.csv','w');
-        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        $idCategory = getMaxIdCategory(ADMIN_AJAX_CATEGORIES_PATH)+1;
+        fopen(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$idCategory.'.csv','w');
+        $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
         $categories[]= array(
             "id"=>$idCategory,
             "name"=>$name,
             "count"=>0
         );
         $str = json_encode($categories);
-        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
-        return true;
+        file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+        $category = array('id'=>$idCategory,'name' => $name);
+        return array('status'=>true,'category'=>$category);
     }
 
     # Возвращает максимальный id категорий
-    function getMaxIdCategory(){
-        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+    function getMaxIdCategory($path = ADMIN_CATEGORIES_PATH){
+        $categories = getAllCategories($path);
         $id = $categories[0]["id"];
         foreach ($categories as $category){
             if ($category["id"] > $id){
@@ -203,7 +224,7 @@ function validateUser($email,$password){
 
     # Переименование категории
     function renameCategory($id, $newName){
-        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
         foreach ($categories as &$category){
             if($category["id"] == $id){
                 $category["name"] = $newName;
@@ -211,28 +232,30 @@ function validateUser($email,$password){
             }
         }
         $str = json_encode($categories);
-        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
-        return true;
+        file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+        return array("status"=>true,"name"=>$newName);
     }
 
     # Удаление категории
     function deleteCategory($categoryId){
         $items = getAllItems($categoryId);
         foreach ($items as $item){
-            unlink(ADMIN_IMAGES_PATH.$item[0]);
+            unlink(ADMIN_AJAX_IMAGES_PATH.$item[0]);
         }
-        unlink(ADMIN_CATEGORIES_ITEMS_PATH.$categoryId.'.csv');
-        $categories = getAllCategories(ADMIN_CATEGORIES_PATH);
+        unlink(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$categoryId.'.csv');
+        $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
         foreach ($categories as $key=>$category){
             if($category["id"] == $categoryId){
+                $name = $category["name"];
                 unset($categories[$key]);
                 break;
             }
         }
         $categories = array_values($categories);
         $str = json_encode($categories);
-        file_put_contents(ADMIN_CATEGORIES_PATH,$str);
-        return true;
+        file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+        $category = array('id'=>$categoryId,'name' => $name);
+        return array('status'=>true,'category'=>$category);
     }
 
     # Получить все items из валидации csv
@@ -273,8 +296,6 @@ function validateUser($email,$password){
     }
     # Удаление item
 
-
-
     function getInfo($path = INFO_PATH){
         if(file_exists($path)){
             $content = file_get_contents($path);
@@ -287,8 +308,9 @@ function validateUser($email,$password){
     # Get last 10 items from file csv
     function getLastItemsCountByStep($categoryId, $count = 10, $step =  0){
         $fileName = ITEM_PATH.$categoryId.".csv";
-        if (file_exists($fileName)){
-
+        if (!file_exists($fileName)) {
+            return getLatestItems();
+        }
             $items = array();
             $handler = fopen($fileName,"r");
             $countLines = 0;
@@ -310,14 +332,22 @@ function validateUser($email,$password){
                 }
             }
             fclose($handler);
-            return $items;
+        return $items;
+    }
+
+    # Возвращает 10 новейших катринок
+    function getLatestItems(){
+        $categories = getAllCategories();
+        $items = array();
+        foreach ($categories as $category){
+            $items = array_merge ($items, getLastItemsCountByStep($category['id'], $count = 10, $step =  0));
         }
-        return "getLastItemsCountByStep $fileName ERROR";
+        return $items;
     }
 
     # Возвращает массив объектов из sv
     function getAllItems($categoryId){
-        $fileName = ADMIN_CATEGORIES_ITEMS_PATH.$categoryId.".csv";
+        $fileName = ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$categoryId.".csv";
         if (file_exists($fileName)){
             $items = array();
             $handler = fopen($fileName,"r");
@@ -359,4 +389,55 @@ function validateUser($email,$password){
         }else{
             return false;
         }
+    }
+
+    # Инициализация админ панели
+    function initAdmin(){
+        $admin = array();
+        $admin["categories"] = getAllCategories(ADMIN_CATEGORIES_PATH);
+        $admin["info"] = getInfo(ADMIN_INFO_PATH);
+        $admin["validationItems"] = getItemsValidation();
+        $admin["count"] = getAllItemsCount(ADMIN_CATEGORIES_PATH);
+        return $admin;
+    }
+
+    function changePassword($password,$new_password){
+        $answer = array();
+        $answer["status"] = false;
+        $info = getInfo(ADMIN_AJAX_INFO_PATH);
+        $pass = $info["password"];
+        if ($pass != md5(md5($password)."warcraft3")){
+            $answer["message"] = "Старый пароль введен не верно";
+            return $answer;
+        }
+
+        $info["password"] = md5(md5($new_password)."warcraft3");
+
+        $str = json_encode($info);
+        file_put_contents(ADMIN_AJAX_INFO_PATH,$str);
+        $answer["message"] = "Пароль изменен";
+        $answer["status"] = true;
+        return $answer;
+    }
+
+    function changeInfo($email,$title,$subTitle){
+        $info = getInfo(ADMIN_AJAX_INFO_PATH);
+        $info["email"] = $email;
+        $info["title"] = $title;
+        $info["subTitle"] = $subTitle;
+        $str = json_encode($info);
+        file_put_contents(ADMIN_AJAX_INFO_PATH,$str);
+        $answer["status"] = true;
+        $answer["message"] = "Информация успешно сохранилась";
+        $answer["email"] = $email;
+        return $answer;
+    }
+
+    function getAllItemsCount($path = CATEGORY_PATH){
+        $count = 0;
+        $categories = getAllCategories($path);
+        foreach ($categories as $category){
+            $count += $category["count"];
+        }
+        return $count;
     }

@@ -36,7 +36,7 @@ html,body{
 .width18PER{width: 20%;}
 
 .marginBottom20PX{
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
 }
 .paddingTopBottom40px{
     padding-top: 40px;

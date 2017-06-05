@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse marginBottom0PX">
+<nav class="navbar navbar-inverse marginBottom0PX <?php  if (count($items) < 2) {echo 'navbar-fixed-bottom';}?>">
     <div class="container paddingTopBottom40px">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">

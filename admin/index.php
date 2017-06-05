@@ -1,4 +1,6 @@
-<?php require_once 'api/utils.php' ?>
+<?php
+session_start();
+require_once 'api/utils.php' ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../src/img/favicon.ico">
+    <link rel="icon" href="../src/images/icon.png">
 
     <title>Администратор</title>
 
@@ -15,30 +17,39 @@
 
     <!-- Custom styles for this template -->
     <link href="../src/css/admin.css" rel="stylesheet">
+    <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script defer src="../src/js/bootstrap.min.js"></script>
+
   </head>
 
   <body>
-
   <?php
     $email = $_POST["email"];
     $password = $_POST["password"];
+
+    if (isset($_SESSION["email"],$_SESSION["password"])){
+        $email = $_SESSION["email"];
+        $password = $_SESSION["password"];
+    }
+
     if( isset($email,$password)){
         $access = validateUser($email,$password);
         if ($access["status"]){
-            require 'views/admin_panel.php';
-            validateItem('img3.jpeg',1,"ffdd");
+            $admin = initAdmin();
+            $_SESSION["email"] = $email;
+            $_SESSION["password"] = $password;
+            require_once 'views/admin_panel.php';
         }else{
-            require 'views/admin_form.php';
+            require_once 'views/admin_form.php';
         }
     }else {
-        require 'views/admin_form.php';
+        require_once 'views/admin_form.php';
     }
   ?>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script defer src="../src/js/bootstrap.min.js"></script>
+
   </body>
 </html>

@@ -1,5 +1,29 @@
 
 .marginTop20PX{margin-top: 20px;}
+.marginBottom15PX{margin-bottom: 15px;}
+.marginRight4PX{margin-right: 4px;}
+.marginLeft5PX{margin-left: 5px;}
+.marginTop2PX {
+  margin-top: 2px;
+}
+.panel-body{
+  background-color: gray;
+}
+
+.list-group{
+  margin-bottom: 0px;
+}
+
+
+.fontSize12PX, .fontSize12PX:focus{
+  font-size: 12px !important;
+  text-decoration: none;
+  padding-top: 2px;
+}
+
+.fontSize12PX:hover{
+  text-decoration-style: dashed;
+}
 
 .form-signin {
   max-width: 330px;
@@ -33,4 +57,15 @@
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
+}
+
+.alert {
+  border-radius: 0px;
+}
+
+
+@media (max-width:768px) {
+  .alert{
+    margin: 0px 15px 20px 15px;
+  }
 }

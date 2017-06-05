@@ -28,11 +28,11 @@
                     <div class="form-group">
                         <label class="control-label">Категория</label>
                         <select id="add_item_category" class="form-control" name="category">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
+                            <?php foreach ($categories as $category) {?>
+                                <option value="<?php echo $category["id"];?>">
+                                    <?php echo $category["name"];?>
+                                </option>
+                            <?php } ?>
                         </select>
                     </div>
                     <div class="form-group">

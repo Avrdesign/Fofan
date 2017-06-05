@@ -265,7 +265,10 @@
             $items = array();
             $handler = fopen($fileName,"r");
             while( !feof( $handler)){
-                $items[] = fgetcsv($handler);
+                $item = fgetcsv($handler);
+                if ($item[0]){
+                    $items[] = $item;
+                }
             }
             fclose($handler);
             return $items;
@@ -342,7 +345,11 @@
         foreach ($categories as $category){
             $items = array_merge ($items, getLastItemsCountByStep($category['id'], $count = 10, $step =  0));
         }
-        return $items;
+        usort($items, function($a, $b) {
+            return $a[1] - $b[1];
+        });
+
+        return $sliced_array = array_slice($items, 0, 10);
     }
 
     # Возвращает массив объектов из sv

@@ -53,6 +53,21 @@ if (isset($type)){
                 $answer = changeInfo($email,$title,$subTitle);
             }
             break;
+        case 'validation_item_remove':
+            $name = $_POST['name'];
+            if (isset($name)){
+                $answer["status"] = deleteValidationItem($name);
+            }
+            break;
+        case 'validation_item_save':
+            $imageName = $_POST['name'];
+            $categoryId = $_POST['id'];
+            $title = $_POST['title'];
+
+            if (isset($imageName,$categoryId,$title)){
+                $answer["status"] = validateItem($imageName,$categoryId,$title);
+            }
+            break;
         default:break;
     }
     echo json_encode($answer);

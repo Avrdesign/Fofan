@@ -2,10 +2,52 @@ var alertObject = new AlertObject();
 var ajaxObject = new AjaxObject();
 var deleteObject = new DeleteObject();
 var renameObject = new RenameObject();
+var saveObject = new SaveObject();
+
+function SaveObject() {
+    var self = this;
+    var deleteItemValidation;
+    var formData;
+
+    self.saveValidateItem  = function (element){
+        var form = element.parentNode.parentNode;
+        deleteItemValidation = form.parentNode;
+        formData = new FormData(form);
+        formData.append('form','validation_item_save');
+        var modal = document.getElementsByClassName('saveValidationObject')[0];
+        modal.innerHTML = "Одобрить ?";
+    }
+
+    self.saveValidateItemFlush  = function (){
+        if (formData){
+            ajaxObject.postData(
+                'api/adminApi.php',
+                formData,
+                'json',
+                function(data){
+                    if(data['status']){
+                        alertObject.showAlert("success",'Картинка одобрена');
+                        if (deleteItemValidation){
+                            deleteItemValidation.parentNode.removeChild(deleteItemValidation);
+                        }
+                    }else{
+                        alertObject.showAlert("danger",'Ошибка сервера');
+                    }
+                },
+                function(x,y,z){
+                    alertObject.showAlert("danger",'Ошибка сервера');
+                }
+            );
+        }
+    }
+
+}
+
 
 function DeleteObject(){
     var self = this;
     var deleteItem;
+    var formData;
 
     self.delete = function(element){
         deleteItem = element.parentNode;
@@ -14,6 +56,38 @@ function DeleteObject(){
         var modal = document.getElementsByClassName('deleteObject')[0];
         modal.innerHTML = "Вы уверен, что хотите удалить "+categoryName + " ?";
         modal.parentNode.setAttribute('data-id',categoryId);
+    }
+
+    self.deleteValidateItem  = function (element){
+        var form = element.parentNode.parentNode;
+        deleteItem = form.parentNode;
+        formData = new FormData(form);
+        formData.append('form','validation_item_remove');
+        var modal = document.getElementsByClassName('deleteValidationObject')[0];
+        modal.innerHTML = "Вы уверен, что хотите удалить эту картинку ?";
+    }
+
+    self.deleteValidateItemFlush  = function (){
+        if (formData){
+            ajaxObject.postData(
+                'api/adminApi.php',
+                formData,
+                'json',
+                function(data){
+                    if(data['status']){
+                        alertObject.showAlert("success",'Картинка удалена');
+                        if (deleteItem){
+                            deleteItem.parentNode.removeChild(deleteItem);
+                        }
+                    }else{
+                        alertObject.showAlert("danger",'Ошибка сервера');
+                    }
+                },
+                function(x,y,z){
+                    alertObject.showAlert("danger",'Ошибка сервера');
+                }
+            );
+        }
     }
 
     self.deleteFlush = function(element){

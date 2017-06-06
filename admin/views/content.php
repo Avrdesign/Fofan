@@ -1,8 +1,8 @@
 <?php foreach($items as $item) { ?>
     <div class="thumbnail backgroundColorBlack">
-        <img src="<?php echo IMAGES_PATH.$item[2];?>" alt="...">
+        <img src="<?php echo IMAGES_PATH.$item[0];?>" alt="...">
         <div class="colorLightGray">
-            <h4 class="text-center colorWhite"><?php echo $item[3];?></h4>
+            <h4 class="text-center colorWhite"><?php echo $item[2];?></h4>
             <div class="pull-right paddingLeftRight3PX">
                               <span class="fontSize16PX">
                                   <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>

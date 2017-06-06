@@ -11,7 +11,7 @@
     define('ITEM_PATH',"admin/DB/category_items_");
     define('ITEM_VALIDATION_PATH',"../DB/items_validation.csv");
     define('IMAGES_PATH',"src/images/");
-    define('IMAGE_MAX_WIDTH',400);
+    define('IMAGE_MAX_WIDTH',500);
 
     define('ADMIN_VALIDATION_ITEMS_PATH','DB/items_validation.csv');
     define('ADMIN_CATEGORIES_ITEMS_PATH','DB/category_items_');
@@ -143,14 +143,21 @@
 
     function addItemToCategoryFile($title,$time,$imageName,$id){
 
-        if (file_exists(ADMIN_CATEGORIES_ITEMS_PATH.$id.'.csv') && $imageName){
-            $handler = fopen(ADMIN_CATEGORIES_ITEMS_PATH.$id.'.csv','a');
+        if (file_exists(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$id.'.csv') && $imageName){
+            $handler = fopen(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$id.'.csv','a');
             $item = array($imageName,$time,$title);
             fputcsv($handler,$item);
             fclose($handler);
-            return true;
-        }
 
+            $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
+            foreach ($categories as &$category) {
+                if ($category["id"] == $id){
+                    $category["count"] ++;
+                }
+            }
+            $str = json_encode($categories);
+            return file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+        }
         return false;
     }
 
@@ -259,11 +266,10 @@
     }
 
     # Получить все items из валидации csv
-    function getItemsValidation(){
-        $fileName = ADMIN_VALIDATION_ITEMS_PATH;
-        if (file_exists($fileName)){
+    function getItemsValidation($path = ADMIN_VALIDATION_ITEMS_PATH){
+        if (file_exists($path)){
             $items = array();
-            $handler = fopen($fileName,"r");
+            $handler = fopen($path,"r");
             while( !feof( $handler)){
                 $item = fgetcsv($handler);
                 if ($item[0]){
@@ -273,12 +279,12 @@
             fclose($handler);
             return $items;
         }
-        return "getLastItemsCountByStep $fileName ERROR";
+        return "getLastItemsCountByStep $path ERROR";
     }
 
     # Валидация item
     function validateItem($imageName,$categoryId,$title){
-        $validationItems = getItemsValidation();
+        $validationItems = getItemsValidation(ADMIN_AJAX_VALIDATION_ITEMS_PATH);
         foreach ($validationItems as $key=>$validationItem){
             if ($validationItem[0] == $imageName){
                 unset($validationItems[$key]);
@@ -290,12 +296,14 @@
         return addItemToCategoryFile($title,time(),$imageName,$categoryId);
     }
 
-    function outputCSV($validationItems) {
-        $handler = fopen(ADMIN_VALIDATION_ITEMS_PATH, 'w');
+    # Запись итемов в файл через AJAX
+    function outputCSV($validationItems, $path = ADMIN_AJAX_VALIDATION_ITEMS_PATH) {
+        $handler = fopen($path, 'w');
         foreach($validationItems as $item) {
             fputcsv($handler, $item);
         }
         fclose($handler);
+        return true;
     }
     # Удаление item
 
@@ -343,10 +351,10 @@
         $categories = getAllCategories();
         $items = array();
         foreach ($categories as $category){
-            $items = array_merge ($items, getLastItemsCountByStep($category['id'], $count = 10, $step =  0));
+            $items = array_merge($items, getLastItemsCountByStep($category['id'], $count = 10, $step =  0));
         }
         usort($items, function($a, $b) {
-            return $a[1] - $b[1];
+            return $b[1] - $a[1];
         });
 
         return $sliced_array = array_slice($items, 0, 10);
@@ -447,4 +455,17 @@
             $count += $category["count"];
         }
         return $count;
+    }
+
+    function deleteValidationItem($name){
+        $items = getItemsValidation(ADMIN_AJAX_VALIDATION_ITEMS_PATH);
+        foreach ($items as $key=>$validationItem){
+            if ($validationItem[0] == $name){
+                unset($items[$key]);
+                unlink(ADMIN_AJAX_IMAGES_PATH.$validationItem[0]);
+                break;
+            }
+        }
+        $items = array_values($items);
+        return outputCSV($items);
     }

@@ -445,6 +445,7 @@
         $answer["status"] = true;
         $answer["message"] = "Информация успешно сохранилась";
         $answer["email"] = $email;
+        $_SESSION["email"] = $email;
         return $answer;
     }
 
@@ -468,4 +469,53 @@
         }
         $items = array_values($items);
         return outputCSV($items);
+    }
+
+
+    function searchItemsByValue($value){
+        $items = array();
+        $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
+        foreach ($categories as $category){
+            $temp_items = getAllItems($category["id"]);
+            foreach ($temp_items as $item){
+                if (strpos($item[2], $value) !== false || $value == $item[0]) {
+                    $items[] = array(
+                        "category"=>$category,
+                        "item"=>$item
+                    );
+                }
+            }
+            unset($item);
+            unset($temp_items);
+        }
+        return array("status"=>true, "items"=>$items);
+    }
+
+    function saveItemFromAdminPanel($imageName,$categoryId,$title){
+        $items = getAllItems($categoryId);
+        $handler = fopen(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$categoryId.".csv",'w');
+        foreach ($items as $item){
+            if($item[0] == $imageName){
+                $item[2] = $title;
+            }
+            fputcsv($handler,$item);
+        }
+        fclose($handler);
+        return true;
+
+    }
+
+    function deleteItemFromAdminPanel($imageName,$categoryId){
+
+        $items = getAllItems($categoryId);
+        $handler = fopen(ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$categoryId.".csv",'w');
+        foreach ($items as $item){
+            if($item[0] == $imageName){
+                unlink(ADMIN_AJAX_IMAGES_PATH.$imageName);
+               continue;
+            }
+            fputcsv($handler,$item);
+        }
+        fclose($handler);
+        return true;
     }

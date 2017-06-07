@@ -3,7 +3,143 @@ var ajaxObject = new AjaxObject();
 var deleteObject = new DeleteObject();
 var renameObject = new RenameObject();
 var saveObject = new SaveObject();
+var searchObject = new SearchObject();
+var itemViewSearch = new ItemView();
 
+function SearchObject(){
+    var self = this;
+    var typing = false;
+    var timer;
+
+    self.searchItem = function(value) {
+        typing = true;
+        if (timer) {
+            clearTimeout(timer);
+        }
+        if (value) {
+            timer = setTimeout(function () {
+                var form = new FormData();
+                form.append('form', 'search_item');
+                form.append('text', value);
+                ajaxObject.postData(
+                    'api/adminApi.php',
+                    form,
+                    'json',
+                    function (data) {
+                        if(data["status"]){
+                            itemViewSearch.initSearchView(data["items"]);
+                        }
+                    },
+                    function (x, y, z) {
+                        alertObject.showAlert("danger", 'Ошибка сервера');
+                    }
+                );
+            }, 1000);
+        }
+    }
+}
+function ItemView(){
+
+    var self = this;
+    var deleteItemValidation;
+    var formData;
+    var imgPath = "../src/images/";
+    var parentView = document.getElementById('parentForSearchItems');
+
+    self.initSearchView = function (items) {
+        var inner = "";
+        if (parentView){
+            parentView.innerHTML = "";
+            for(var i = 0; i < items.length; i++){
+                var item = items[i]["item"];
+                var category = items[i]["category"];
+                inner += createView(category["id"], item[0], item[2]);
+                parentView.innerHTML = inner;
+            }
+        }
+    }
+
+    function createView(cat_id, img, title){
+        return '<li class="list-group-item">'+
+            '<form class="row">'+
+                '<input type="hidden" name="cat_id" value="'+cat_id+'">'+
+                '<input type="hidden" name="item_img" value="'+img+'">'+
+                '<div class="form-group col-sm-5">'+
+                    '<label for="exampleImg2">Картинка</label>'+
+                    '<img class="img-responsive" src="'+imgPath+img+'" alt="">'+
+                '</div>'+
+                '<div class="form-group col-sm-5">'+
+                    '<label for="exampleTextArea2">Заголовок</label>'+
+                    '<textarea class="form-control" name="title" rows="5" maxlength="300" id="exampleTextArea2" placeholder="Заготовок">'+title+'</textarea>'+
+                '</div>'+
+                '<div class="form-group col-sm-1">'+
+                    '<label for="exampleTextArea2">Сохранить</label>'+
+                    '<button type="button" class="btn btn-success" onclick="itemViewSearch.saveItem(this.parentNode.parentNode);" data-toggle="modal" data-target=".save-item-modal-sm">'+
+                        '<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>'+
+                    '</button>'+
+                '</div>'+
+                '<div class="form-group col-sm-1">'+
+                    '<label for="exampleTextArea2">Удалить</label>'+
+                    '<button type="button" class="btn btn-danger" onclick="itemViewSearch.deleteItem(this.parentNode.parentNode);" data-toggle="modal" data-target=".delete-item-modal-sm">'+
+                        '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>'+
+                    '</button>'+
+                '</div>'+
+            '</form>'+
+        '</li>';
+    }
+
+    self.saveItem = function(form){
+        formData = new FormData(form);
+        formData.append('form','save_item');
+    }
+    self.deleteItem = function(form){
+        formData = new FormData(form);
+        deleteItemValidation = form.parentNode;
+        formData.append('form','delete_item');
+    }
+    self.saveItemFlush = function(){
+        if(formData){
+            ajaxObject.postData(
+                'api/adminApi.php',
+                formData,
+                'json',
+                function (data) {
+                    console.log(data);
+                    if(data["status"]){
+                        alertObject.showAlert("success", 'Данные успешно сохранены');
+                    }else{
+                        alertObject.showAlert("danger", 'Ошибка сервера');
+                    }
+                },
+                function (x, y, z) {
+                    alertObject.showAlert("danger", 'Ошибка сервера');
+                }
+            );
+        }
+    }
+    self.deleteItemFlush = function(){
+        if(formData){
+            ajaxObject.postData(
+                'api/adminApi.php',
+                formData,
+                'json',
+                function (data) {
+                    console.log(data);
+                    if(data["status"]){
+                        alertObject.showAlert("success", 'Данные успешно удалены');
+                        deleteItemValidation.parentNode.removeChild(deleteItemValidation);
+                    }else{
+                        alertObject.showAlert("danger", 'Ошибка сервера');
+                    }
+                },
+                function (x, y, z) {
+                    alertObject.showAlert("danger", 'Ошибка сервера');
+                }
+            );
+        }
+    }
+
+}
 function SaveObject() {
     var self = this;
     var deleteItemValidation;
@@ -42,8 +178,6 @@ function SaveObject() {
     }
 
 }
-
-
 function DeleteObject(){
     var self = this;
     var deleteItem;

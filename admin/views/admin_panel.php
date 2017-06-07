@@ -1,6 +1,6 @@
 <div class="container">
     <div class="page-header">
-        <h1>Администратор <small id="emailUser">zankoav@mail.ru</small></h1>
+        <h1>Администратор <small id="emailUser"><?php echo $admin["info"]["email"];?></small></h1>
     </div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">

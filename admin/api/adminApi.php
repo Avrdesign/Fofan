@@ -68,6 +68,27 @@ if (isset($type)){
                 $answer["status"] = validateItem($imageName,$categoryId,$title);
             }
             break;
+        case 'search_item':
+            $value = $_POST['text'];
+            if (isset($value)){
+                $answer = searchItemsByValue($value);
+            }
+            break;
+        case 'save_item':
+            $imageName = $_POST['item_img'];
+            $categoryId = $_POST['cat_id'];
+            $title = $_POST['title'];
+            if (isset($imageName,$categoryId,$title)){
+                $answer["status"] = saveItemFromAdminPanel($imageName,$categoryId,$title);
+            }
+            break;
+        case 'delete_item':
+            $categoryId = $_POST['cat_id'];
+            $imageName = $_POST['item_img'];
+            if (isset($categoryId,$imageName)){
+                $answer["status"] = deleteItemFromAdminPanel($imageName,$categoryId);
+            }
+            break;
         default:break;
     }
     echo json_encode($answer);

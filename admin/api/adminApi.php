@@ -89,6 +89,24 @@ if (isset($type)){
                 $answer["status"] = deleteItemFromAdminPanel($imageName,$categoryId);
             }
             break;
+        case 'save_banners':
+            $url_left = $_POST["url_left"];
+            $url_center = $_POST["url_center"];
+            $url_right = $_POST["url_right"];
+            $id = $_POST["id"];
+            if (isset($url_left,$url_center,$url_right)){
+                $answer = saveBanners($id,$url_left,$url_center,$url_right);
+            }
+            break;
+        case 'remove_banner':
+
+            $position = $_POST["pos"];
+            $cat_id = $_POST["cat_id"];
+
+            if (isset($position,$cat_id)){
+                $answer = removeBanner($cat_id,$position);
+            }
+            break;
         default:break;
     }
     echo json_encode($answer);

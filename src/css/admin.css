@@ -2,12 +2,49 @@
 .marginTop20PX{margin-top: 20px;}
 .marginBottom15PX{margin-bottom: 15px;}
 .marginRight4PX{margin-right: 4px;}
+.marginRight15PX{margin-right: 15px !important;}
 .marginLeft5PX{margin-left: 5px;}
 .marginTop2PX {
   margin-top: 2px;
 }
+.marginBottom20PX {
+  margin-bottom: 20px;
+}
+
+#accordion [type='file'] {
+  display: none;
+}
+
+#accordion .marginBottom15PX{
+  margin-bottom: 15px;
+}
+
+.positionAbsoluteLeftTop{
+  position: absolute;
+  margin: 0 0 0 15px;
+  top:0;
+  left:0;
+}
+
+.positionAbsoluteLeftTopRemove{
+  position: absolute;
+  margin: 0 0 0 55px;
+  top:0;
+  left:0;
+}
+
+.btn {
+  border-radius: 0px;
+}
+
 .panel-body{
   background-color: gray;
+}
+
+.marginBottom0PX{margin-bottom: 0;}
+
+#accordion .panel-body {
+  background-color: white;
 }
 
 .list-group{

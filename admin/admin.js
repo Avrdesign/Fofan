@@ -5,6 +5,110 @@ var renameObject = new RenameObject();
 var saveObject = new SaveObject();
 var searchObject = new SearchObject();
 var itemViewSearch = new ItemView();
+var bannerView = new BannersItem();
+
+
+function BannersItem(){
+    var self = this;
+    var removeImage;
+    var imgChange;
+
+    self.showImage = function(element){
+        var parent = element.parentNode;
+        var inputFile = parent.getElementsByTagName('input')[0];
+        inputFile.click();
+    }
+
+    self.showImageSrc = function(input) {
+        if (input.files && input.files[0]) {
+            var parent = input.parentNode;
+            var img = parent.getElementsByTagName('img')[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                img.src =  e.target.result ;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    self.toRemove = function(element){
+        var parent = element.parentNode;
+        var inputName = parent.getElementsByTagName('input')[0].getAttribute('name');
+        var arr = inputName.split('_');
+        var position = arr[arr.length-1];
+
+        var form = parent.parentNode.parentNode;
+        var catId = (form.parentNode.parentNode).getAttribute('aria-labelledby');
+        if(catId != 'all'){
+            var arr = catId.split('_');
+            catId = arr[arr.length-1];
+        }
+        console.log('catId = ' + catId);
+        console.log('position = ' + position);
+        removeImage = new FormData();
+        removeImage.append('form','remove_banner');
+        removeImage.append('cat_id',catId);
+        removeImage.append('pos',position);
+        imgChange = parent.getElementsByTagName('img')[0];
+    }
+
+    self.sendBanners = function(element){
+
+        var form = element.parentNode;
+        var catId = (form.parentNode.parentNode).getAttribute('aria-labelledby');
+        if(catId != 'all'){
+            var arr = catId.split('_');
+            catId = arr[arr.length-1];
+        }
+        var formData = new FormData(form);
+        formData.append('form','save_banners');
+        formData.append('id',catId);
+        ajaxObject.postData(
+            'api/adminApi.php',
+            formData,
+            'json',
+            function (data) {
+                console.log(data);
+                if(data["status"]){
+                    alertObject.showAlert("success", 'Данные успешно сохранены');
+
+                }else{
+                    alertObject.showAlert("danger", 'Ошибка сервера');
+                }
+            },
+            function (x, y, z) {
+                alertObject.showAlert("danger", 'Ошибка сервера');
+            }
+        );
+    }
+
+    self.deleteBanner = function(element){
+       if (removeImage){
+           ajaxObject.postData(
+               'api/adminApi.php',
+               removeImage,
+               'json',
+               function (data) {
+                   console.log(data);
+                   if(data["status"]){
+                       alertObject.showAlert("success", 'Данные успешно удалены');
+                       if(imgChange){
+                           imgChange.src = '../src/images/picture.png';
+                       }
+                   }else{
+                       alertObject.showAlert("danger", 'Ошибка сервера');
+                   }
+               },
+               function (x, y, z) {
+                   alertObject.showAlert("danger", 'Ошибка сервера');
+               }
+           );
+       }else{
+           console.log("Error");
+       }
+    }
+
+}
 
 function SearchObject(){
     var self = this;
@@ -38,6 +142,7 @@ function SearchObject(){
         }
     }
 }
+
 function ItemView(){
 
     var self = this;
@@ -58,6 +163,74 @@ function ItemView(){
             }
         }
     }
+
+    self.createBannersView = function (cat_id, cat_name){
+        return '<div class="panel panel-warning">'+
+                    '<div class="panel-heading" role="tab" id="head_' + cat_name + '_' + cat_id+'">'+
+                        '<h4 class="panel-title">'+
+                            '<a role="button" data-toggle="collapse" data-parent="#accordion" href="#content_' + cat_name + '_' + cat_id+'" aria-expanded="false" aria-controls="' + cat_name + '_' + cat_id+'">'+
+                                cat_name+
+                            '</a>'+
+                        '</h4>'+
+                    '</div>'+
+                    '<div id="content_' + cat_name + '_' + cat_id+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="' + cat_name + '_' + cat_id+'">'+
+                        '<div class="panel-body panel-info ">'+
+                            '<form class="row">'+
+                                '<div class="form-group marginBottom20PX">'+
+                                    '<label for="url_left" class="col-sm-2 control-label">Левый</label>'+
+                                    '<div class="col-sm-5 marginBottom20PX">'+
+                                        '<input type="text" class="form-control" id="url_left" name="url_left" placeholder="Ссылка на левый банер">'+
+                                    '</div>'+
+                                    '<div class="col-sm-5 marginBottom20PX">'+
+                                        '<input type="file" accept="image/jpeg,image/png,image/gif" name="img_left" onchange="bannerView.showImageSrc(this);">'+
+                                        '<img class="img-responsive" src="../src/images/picture.png" alt="">'+
+                                        '<button type="button" class="btn btn-warning positionAbsoluteLeftTop" onclick="bannerView.showImage(this);">'+
+                                            '<span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>'+
+                                        '</button>'+
+                                        '<button type="button" class="btn btn-danger positionAbsoluteLeftTopRemove" onclick="console.log(this);" data-toggle="modal" data-target=".remove-banner-modal-sm">'+
+                                            '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>'+
+                                        '</button>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="form-group marginBottom20PX">'+
+                                    '<label for="url_center" class="col-sm-2 control-label">Центр</label>'+
+                                    '<div class="col-sm-5 marginBottom20PX">'+
+                                        '<input type="text" class="form-control" id="url_center" name="url_center" placeholder="Ссылка на центральный банер">'+
+                                    '</div>'+
+                                    '<div class="col-sm-5 marginBottom20PX">'+
+                                        '<input type="file" accept="image/jpeg,image/png,image/gif" name="img_center" onchange="bannerView.showImageSrc(this);">'+
+                                        '<img class="img-responsive" src="../src/images/picture.png" alt="">'+
+                                        '<button type="button" class="btn btn-warning positionAbsoluteLeftTop" onclick="bannerView.showImage(this);">'+
+                                            '<span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>'+
+                                        '</button>'+
+                                        '<button type="button" class="btn btn-danger positionAbsoluteLeftTopRemove" onclick="console.log(this);" data-toggle="modal" data-target=".remove-banner-modal-sm">'+
+                                            '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>'+
+                                        '</button>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="form-group marginBottom20PX">'+
+                                        '<label for="url_right" class="col-sm-2 control-label">Правый</label>'+
+                                        '<div class="col-sm-5 marginBottom20PX">'+
+                                            '<input type="text" class="form-control" id="url_left" name="url_right" placeholder="Ссылка на правый банер">'+
+                                        '</div>'+
+                                        '<div class="col-sm-5 marginBottom20PX">'+
+                                            '<input type="file" accept="image/jpeg,image/png,image/gif" name="img_right" onchange="bannerView.showImageSrc(this);">'+
+                                            '<img class="img-responsive" src="../src/images/picture.png" alt="">'+
+                                            '<button type="button" class="btn btn-warning positionAbsoluteLeftTop" onclick="bannerView.showImage(this);">'+
+                                                '<span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>'+
+                                            '</button>'+
+                                            '<button type="button" class="btn btn-danger positionAbsoluteLeftTopRemove" onclick="console.log(this);" data-toggle="modal" data-target=".remove-banner-modal-sm">'+
+                                                '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>'+
+                                            '</button>'+
+                                        '</div>'+
+                                '</div>'+
+                                '<button type="button" class="btn btn-success pull-right marginRight15PX" onclick="bannerView.sendBanners(this);">Сохрнить</button>'+
+                            '</form>'+
+                        '</div>'+
+                    '</div>'+
+            '</div>';
+    }
+
 
     function createView(cat_id, img, title){
         return '<li class="list-group-item">'+
@@ -87,7 +260,6 @@ function ItemView(){
             '</form>'+
         '</li>';
     }
-
     self.saveItem = function(form){
         formData = new FormData(form);
         formData.append('form','save_item');
@@ -97,6 +269,7 @@ function ItemView(){
         deleteItemValidation = form.parentNode;
         formData.append('form','delete_item');
     }
+
     self.saveItemFlush = function(){
         if(formData){
             ajaxObject.postData(
@@ -117,6 +290,7 @@ function ItemView(){
             );
         }
     }
+
     self.deleteItemFlush = function(){
         if(formData){
             ajaxObject.postData(
@@ -138,8 +312,8 @@ function ItemView(){
             );
         }
     }
-
 }
+
 function SaveObject() {
     var self = this;
     var deleteItemValidation;
@@ -242,7 +416,10 @@ function DeleteObject(){
         if(data['status']){
             alertObject.showAlert("success",data['message']);
             if (deleteItem){
+                var id = 'head_' + data['category']['name'] + '_' + data['category']['id'];
+                var tempContainer = document.getElementById(id).parentNode;
                 deleteItem.parentNode.removeChild(deleteItem);
+                tempContainer.parentNode.removeChild(tempContainer);
             }
         }else{
             alertObject.showAlert("danger",data['message']);
@@ -409,6 +586,7 @@ function addCategory(){
             if(data['status']){
                 alertObject.showAlert("success",data['message']);
                 addItemToCategoryList(data['category']);
+                document.getElementById('accordion').innerHTML += itemViewSearch.createBannersView(data['category']['id'],data['category']['name']);
             }else{
                 alertObject.showAlert("danger",data['message']);
             }

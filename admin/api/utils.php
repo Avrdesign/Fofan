@@ -178,7 +178,7 @@
             $categories = json_decode($content,true);
             foreach ($categories as $category) {
                 if ($category['id'] == $id){
-                    return $category['id'];
+                    return $category;
                 }
             }
             return false;
@@ -187,9 +187,9 @@
     }
 
     # Возвращает категорию по ее id
-    function getCategoryById($id){
-        if(file_exists(CATEGORY_PATH)){
-            $content = file_get_contents(CATEGORY_PATH);
+    function getCategoryById($id, $path = CATEGORY_PATH){
+        if(file_exists($path)){
+            $content = file_get_contents($path);
             $categories = json_decode($content,true);
             foreach ($categories as $category) {
                 if ($category["id"] == $id){
@@ -209,7 +209,21 @@
         $categories[]= array(
             "id"=>$idCategory,
             "name"=>$name,
-            "count"=>0
+            "count"=>0,
+            "banners"=>array(
+                "left"=>array(
+                    "url"=>"",
+                    "img"=>"picture.png"
+                ),
+                "center"=>array(
+                    "url"=>"",
+                    "img"=>"picture.png"
+                ),
+                "right"=>array(
+                    "url"=>"",
+                    "img"=>"picture.png"
+                )
+            )
         );
         $str = json_encode($categories);
         file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
@@ -518,4 +532,108 @@
         }
         fclose($handler);
         return true;
+    }
+
+    function saveBanners($id,$url_left,$url_center,$url_right){
+
+        $answer = array("status"=>false);
+
+        $tmp_img_left = $_FILES["img_left"]['tmp_name'];
+        $tmp_img_center = $_FILES["img_center"]['tmp_name'];
+        $tmp_img_right = $_FILES["img_right"]['tmp_name'];
+
+        $image_path = '../../'.IMAGES_PATH;
+
+        if ($tmp_img_left){
+            $left_img_name = uploadImageAndResize($tmp_img_left, $image_path, IMAGE_MAX_WIDTH);
+        }
+
+        if ($tmp_img_center){
+            $center_img_name = uploadImageAndResize($tmp_img_center, $image_path, IMAGE_MAX_WIDTH);
+        }
+
+        if ($tmp_img_right){
+            $right_img_name = uploadImageAndResize($tmp_img_right, $image_path, IMAGE_MAX_WIDTH);
+        }
+
+        if ($id == "all"){
+            $info = getInfo(ADMIN_AJAX_INFO_PATH);
+            if (isset($left_img_name)){
+                $info["banners"]["left"]["img"] = $left_img_name;
+            }
+
+            if (isset($center_img_name)){
+                $info["banners"]["center"]["img"] = $center_img_name;
+            }
+
+            if (isset($right_img_name)){
+                $info["banners"]["right"]["img"] = $right_img_name;
+            }
+            $info["banners"]["left"]["url"] = $url_left;
+            $info["banners"]["center"]["url"] = $url_center;
+            $info["banners"]["right"]["url"] = $url_right;
+            $str = json_encode($info);
+            file_put_contents(ADMIN_AJAX_INFO_PATH,$str);
+            $answer["status"] = true;
+        }else{
+            $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
+            foreach ($categories as &$category){
+                if ($category['id'] == $id){
+                    if (isset($left_img_name)){
+                        $category["banners"]["left"]["img"] = $left_img_name;
+                    }
+
+                    if (isset($center_img_name)){
+                        $category["banners"]["center"]["img"] = $center_img_name;
+                    }
+
+                    if (isset($right_img_name)){
+                        $category["banners"]["right"]["img"] = $right_img_name;
+                    }
+
+                    $category["banners"]["left"]["url"] = $url_left;
+                    $category["banners"]["center"]["url"] = $url_center;
+                    $category["banners"]["right"]["url"] = $url_right;
+
+                    break;
+                }
+            }
+            $str = json_encode($categories);
+            file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+            $answer["status"] = true;
+        }
+        return $answer;
+    }
+
+    function removeBanner($id,$position){
+        $answer = array("status"=>false);
+
+        if ($id == "all") {
+            $info = getInfo(ADMIN_AJAX_INFO_PATH);
+            $imgName = $info["banners"][$position]["img"];
+            if ($imgName != 'picture.png'){
+                unlink(ADMIN_AJAX_IMAGES_PATH.$imgName);
+            }
+            $info["banners"][$position]["img"] = 'picture.png';
+            $str = json_encode($info);
+            file_put_contents(ADMIN_AJAX_INFO_PATH,$str);
+            $answer["status"] = true;
+        }else{
+            $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
+            foreach ($categories as &$category){
+                if ($category['id'] == $id){
+                    $imgName = $category["banners"][$position]["img"];
+                    if ($imgName != 'picture.png'){
+                        unlink(ADMIN_AJAX_IMAGES_PATH.$imgName);
+                    }
+                    $category["banners"][$position]["img"] = 'picture.png';
+                    break;
+                }
+            }
+            $str = json_encode($categories);
+            file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+            $answer["status"] = true;
+        }
+
+        return $answer;
     }

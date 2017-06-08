@@ -13,13 +13,8 @@
     </div>
 
     <div class="leftBanner">
-        Место для вашей рекламы
-        Место для вашей рекламы
-
-        Место для вашей рекламы
-
-        Место для вашей рекламы
-
-        Место для вашей рекламы
+        <a href="<?php echo $activeCat['banners']['left']['url'];?>" target="_blank">
+            <img class="img-responsive" src="<?php echo IMAGES_PATH.$activeCat['banners']['left']['img'];?>" alt="">
+        </a>
     </div>
 </div>

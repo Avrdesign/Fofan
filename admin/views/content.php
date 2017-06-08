@@ -16,12 +16,7 @@
     </div>
 <?php } ?>
 <div class="centerBanner marginBottom20PX">
-    Место для вашей рекламы
-    Место для вашей рекламы
-
-    Место для вашей рекламы
-
-    Место для вашей рекламы
-
-    Место для вашей рекламы
+    <a href="<?php echo $activeCat['banners']['center']['url'];?>" target="_blank">
+        <img class="img-responsive" src="<?php echo IMAGES_PATH.$activeCat['banners']['center']['img'];?>" alt="">
+    </a>
 </div>

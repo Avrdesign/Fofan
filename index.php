@@ -38,7 +38,7 @@
 
   <div class="container-fluid ">
       <div class="row">
-          <div class="col-sm-offset-4 col-sm-4">
+          <div id="content_items" class="col-sm-offset-4 col-sm-4">
               <?php require 'admin/views/content.php' ?>
           </div>
       </div>

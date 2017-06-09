@@ -15,14 +15,15 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right visible-xs">
                 <li>
-                    <a href="/zanko">Все
+                    <a href="/zanko" data-id="<?php echo 'all';?>">Все
 <!--                        <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>-->
                         <span class="badge pull-right"><?php echo $totalCount;?></span>
                     </a>
                 </li>
                 <?php foreach ($categories as $category) {?>
                     <li>
-                        <a href="?cat_id=<?php echo $category["id"];?>"><?php echo $category["name"];?>
+                        <a href="?cat_id=<?php echo $category["id"];?>" data-id="<?php echo $category["id"];?>">
+                            <?php echo $category["name"];?>
 <!--                            <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>-->
                             <span class="badge pull-right"><?php echo $category["count"];?></span>
                         </a>

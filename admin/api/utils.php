@@ -286,7 +286,7 @@
             $handler = fopen($path,"r");
             while( !feof( $handler)){
                 $item = fgetcsv($handler);
-                if ($item[0]){
+                if ($item){
                     $items[] = $item;
                 }
             }
@@ -331,10 +331,10 @@
     }
 
     # Get last 10 items from file csv
-    function getLastItemsCountByStep($categoryId, $count = 10, $step =  0){
-        $fileName = ITEM_PATH.$categoryId.".csv";
+    function getLastItemsCountByStep($categoryId,$count = 10,$step = 0, $path = ITEM_PATH){
+        $fileName = $path.$categoryId.".csv";
         if (!file_exists($fileName)) {
-            return getLatestItems();
+            return getLatestItems($step);
         }
             $items = array();
             $handler = fopen($fileName,"r");
@@ -361,27 +361,38 @@
     }
 
     # Возвращает 10 новейших катринок
-    function getLatestItems(){
-        $categories = getAllCategories();
+    function getLatestItems($step=0){
+        $path = $step==0 ? ITEM_PATH : ADMIN_AJAX_CATEGORIES_ITEMS_PATH;
+        $path_cat = $path == ADMIN_AJAX_CATEGORIES_ITEMS_PATH ? ADMIN_AJAX_CATEGORIES_PATH : CATEGORY_PATH;
+        $categories = getAllCategories($path_cat);
+        if($path == ADMIN_AJAX_CATEGORIES_ITEMS_PATH){
+            //return getAllItems($categories[3]["id"],$path);
+        }
         $items = array();
         foreach ($categories as $category){
-            $items = array_merge($items, getLastItemsCountByStep($category['id'], $count = 10, $step =  0));
+            $items = array_merge($items, getAllItems($category["id"],$path));
         }
         usort($items, function($a, $b) {
             return $b[1] - $a[1];
         });
-
-        return $sliced_array = array_slice($items, 0, 10);
+        $def = count($items) - $step*10;
+        $countOffset = $def >= 10 ? 10 : $def;
+        $sliced_array = array_slice($items, $step*10, $countOffset);
+//        $sliced_array["def"] = $def;
+        return $sliced_array;
     }
 
     # Возвращает массив объектов из sv
-    function getAllItems($categoryId){
-        $fileName = ADMIN_AJAX_CATEGORIES_ITEMS_PATH.$categoryId.".csv";
+    function getAllItems($categoryId,$path=ADMIN_AJAX_CATEGORIES_ITEMS_PATH){
+        $fileName = $path.$categoryId.".csv";
         if (file_exists($fileName)){
             $items = array();
             $handler = fopen($fileName,"r");
             while( !feof( $handler)){
-                $items[] = fgetcsv($handler);
+                $item = fgetcsv($handler);
+                if($item){
+                    $items[] = $item;
+                }
             }
             fclose($handler);
             return $items;
@@ -453,7 +464,7 @@
         $info = getInfo(ADMIN_AJAX_INFO_PATH);
         $info["email"] = $email;
         $info["title"] = $title;
-        $info["subTitle"] = $subTitle;
+        $info["sub_title"] = $subTitle;
         $str = json_encode($info);
         file_put_contents(ADMIN_AJAX_INFO_PATH,$str);
         $answer["status"] = true;
@@ -531,6 +542,17 @@
             fputcsv($handler,$item);
         }
         fclose($handler);
+
+        $categories = getAllCategories(ADMIN_AJAX_CATEGORIES_PATH);
+        foreach ($categories as &$category) {
+            if($category["id"] == $categoryId){
+                $category["count"] --;
+                break;
+            }
+        }
+        $str = json_encode($categories);
+        file_put_contents(ADMIN_AJAX_CATEGORIES_PATH,$str);
+
         return true;
     }
 

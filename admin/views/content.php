@@ -8,9 +8,7 @@
                       <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span><?php echo date('d-m-Y',$item[1]);?>
                   </span>
             </div>
-            <div class="vkLike fontSize16PX paddingLeftRight3PX">
-                <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Мне нравится 16
-            </div>
+            <div id="<?php echo $item[0];?>" class="vkLike marginBottom15PX fontSize16PX paddingLeftRight3PX"></div>
         </div>
     </div>
 <?php } ?>

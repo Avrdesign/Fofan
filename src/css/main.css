@@ -2,6 +2,7 @@ html,body{
     font-family: 'Alice', serif;
 }
 .marginTop70PX{margin-top: 70px;}
+.marginBottom15PX{margin-bottom: 15px !important;}
 .backgroundColorBlack {background-color: #101010;}
 .colorWhite{color:white;}
 .colorLightGray{color:#9d9d9d;}
@@ -93,4 +94,8 @@ html,body{
 
 .alert {
     text-align: left;
+}
+
+.vkLike{
+    clear: none !important;
 }

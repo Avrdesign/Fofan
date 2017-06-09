@@ -19,9 +19,21 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+      <script src="https://vk.com/js/api/openapi.js?146" type="text/javascript"></script>
+      <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-77682317-2', 'auto');
+          ga('send', 'pageview');
+          ga('require', 'displayfeatures');
+          setTimeout("ga('send', 'event', 'read', '15_seconds')", 15000);
+
+      </script>
   </head>
   <body>
-
   <?php require 'admin/views/header.php';?>
 
   <div class="container-fluid marginTop70PX">

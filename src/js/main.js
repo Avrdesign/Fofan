@@ -2,12 +2,20 @@
  * Created by alexandrzanko on 5/26/17.
  */
 var ajaxObject = new AJAX_OBJECT();
+var imagePath = "http://php.skotovod.com/src/images/";
 var counterStep = 1;
 var bannerCenter = document.getElementsByClassName('centerBanner')[0];
 var parentActiveCategory = document.getElementsByClassName('data-categories')[0];
 var activeCategory = parentActiveCategory.getElementsByClassName('active')[0].getAttribute('data-id');
 window.addEventListener("scroll", addItems);
-
+(function(){
+    VK.init({apiId: 6067124, onlyWidgets: true});
+    var vk_likes = document.getElementsByClassName('vkLike');
+    for(var i = 0; i < vk_likes.length; i++){
+        var id = vk_likes[i].getAttribute('id');
+        VK.Widgets.Like(id, {type: 'mini', pageTitle: imagePath + id, pageDescription: imagePath + id}, id);
+    }
+})();
 
 function addItemsToScreen(items){
     var parent = document.getElementById('content_items');
@@ -15,6 +23,14 @@ function addItemsToScreen(items){
         parent.innerHTML += getItemView(items[i]);
     }
     parent.appendChild(bannerCenter);
+
+    var vk_likes = document.getElementsByClassName('vkLike');
+    for(var i = 0; i < vk_likes.length; i++){
+        var id = vk_likes[i].getAttribute('id');
+        if (vk_likes[i].innerHTML == ""){
+            VK.Widgets.Like(id, {type: 'mini', pageTitle: imagePath + id, pageDescription: imagePath + id}, id);
+        }
+    }
 }
 
 function getItemView(item){
@@ -25,15 +41,14 @@ function getItemView(item){
                     '<div class="pull-right paddingLeftRight3PX">'+
                         '<span class="fontSize16PX">'+
                         '<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>'+
-                            item[1]+
+                            item[1] +
                         '</span>'+
                     '</div>'+
-                    '<div class="vkLike fontSize16PX paddingLeftRight3PX">'+
-                        '<span class="glyphicon glyphicon-heart" aria-hidden="true"></span> Мне нравится 16'+
-                    '</div>'+
+                    '<div id="'+item[0]+'" class="vkLike marginBottom15PX fontSize16PX paddingLeftRight3PX"></div>'+
                 '</div>'+
             '</div>' ;
 }
+
 
 function addItems() {
     var toTop =
@@ -41,14 +56,13 @@ function addItems() {
         document.body.scrollTop - // текущая прокрутка
         window.innerHeight;  // текущий размер окна браузера
 
-    if (toTop < 100) {
+    if (toTop < 200) {
         window.removeEventListener("scroll", addItems);
         ajaxObject.getData('admin/api/addItemsToScreen.php',{"category_id":activeCategory,"step":counterStep},'json',
             function (data){
                 if (data["status"]){
                     window.addEventListener("scroll", addItems);
                     counterStep++;
-                    console.log(data["items"]);
                     addItemsToScreen(data["items"]);
                 }
             },

@@ -378,7 +378,6 @@
         $def = count($items) - $step*10;
         $countOffset = $def >= 10 ? 10 : $def;
         $sliced_array = array_slice($items, $step*10, $countOffset);
-//        $sliced_array["def"] = $def;
         return $sliced_array;
     }
 
